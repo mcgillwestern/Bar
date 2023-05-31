@@ -1,0 +1,45 @@
+#PCB AND PBDE QUALITY ASSESSMENT "dt_totalcb.csv" & "dt_totalbde.csv"
+library(data.table)
+setwd("C:/Users/joseph.kim/OneDrive - Ocean Wise Conservation Association/Desktop/Computer Software/R/PTP DATA/Contaminants in Concern/2. Data Analysis/FIGURE 6 (Modified)")
+dt_totalcb_bar<-fread("dt_totalcb.csv")
+names(dt_totalcb_bar)
+dt_totalcb_bar[,TOTALCB:=log(TOTALCB)]
+
+dt_totalbde_bar<-fread("dt_totalbde.csv")
+names(dt_totalbde_bar)
+dt_totalbde_bar[,TOTALBDE:=log(TOTALBDE)]
+
+#BARPLOT OF PCB & PBDE
+library(ggplot2)
+dt_location_id<-fread("dt_location_id.csv")
+level_order<-dt_location_id$SYS_LOC_CODE
+gr_pcb_line<-ggplot(dt_totalcb_bar,aes(x=factor(SYS_LOC_CODE,level=level_order),y=TOTALCB))+ 
+                    geom_bar(stat="identity",fill="#FF3300")+
+                    labs(title="",x="",y="Ln total PCBs (pg/g dry wt)\n")+
+                    scale_fill_discrete(guide=FALSE)+
+                    scale_y_continuous(limits=c(0,13),expand=expansion(mult=c(0,0)))+
+                    theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))+
+                    theme(axis.ticks.x=element_blank())+
+                    theme(text=element_text(family="Times New Roman",size=12))+
+                    theme(plot.margin=unit(c(1.5,1.5,1.5,1.5),"lines"))+
+                    geom_hline(yintercept=1.30833282,size=1,linetype="dashed")+
+                    geom_text(aes(0,1.30833282,label=1.31,vjust=-1,hjust=-0.5),size=4)
+gr_pcb_line
+
+gr_pbde_line<-ggplot(dt_totalbde_bar,aes(x=factor(SYS_LOC_CODE,level=level_order),y=TOTALBDE))+ 
+                     geom_bar(stat="identity",fill="#0033FF")+
+                     labs(title="",x="Site",y="Ln total PBDEs (pg/g dry wt)\n")+
+                     scale_fill_discrete(guide=FALSE)+
+                     scale_y_continuous(limits=c(0,13),expand=expansion(mult=c(0,0)))+
+                     theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))+
+                     theme(axis.ticks.x=element_blank())+
+                     theme(text=element_text(family="Times New Roman",size=12))+
+                     theme(plot.margin=unit(c(1.5,1.5,1.5,1.5),"lines"))+
+                     geom_hline(yintercept=6.907755279,size=1,linetype="dashed")+
+                     geom_text(aes(0,6.907755279,label=6.91,vjust=-1,hjust=-0.5),size=4)
+gr_pbde_line
+
+#ARRANGE gr_pcb_line & gr_pbde_line together 
+library(ggpubr)
+gr_figure_6<-ggarrange(gr_pcb_line,gr_pbde_line,labels=c("a)","b)"),font.label=list(size=14,face="plain",color="black"),ncol=1,nrow=2,align="v")
+gr_figure_6
